@@ -114,8 +114,15 @@ self-orbit/
 │   └── openapi/               #    OpenAPI specifications
 │
 ├── frontend/                  # 🖥️ Next.js 15 TypeScript app
-│   ├── app/                   #    App Router pages
-│   ├── components/            #    Reusable UI components
+│   ├── app/
+│   │   ├── dashboard/        #    Dashboard overview
+│   │   ├── expenses/         #    💰 Expense tracking
+│   │   ├── tasks/            #    📋 Task management
+│   │   ├── journal/          #    📓 Journal entries
+│   │   └── dev-tools/        #    🛠️ Developer utilities
+│   ├── components/
+│   │   ├── layout/          #    Layout components (sidebar, nav)
+│   │   └── dev-tools/        #    Data formatters, calculators, prompt library
 │   ├── services/              #    Typed API service layer
 │   └── types/                 #    TypeScript interfaces
 │
@@ -197,15 +204,62 @@ npm run affected:build
 
 ---
 
-## 🔗 Service Communication
+## 🔗 Service Communication & Frontend Navigation
 
-| Route | Protocol | Description |
-|-------|----------|-------------|
-| `Frontend → Gateway` | REST/JSON | All client-facing API calls |
-| `Gateway → Expense Service` | HTTP | Request routing via YARP |
-| `Gateway → Productivity Service` | HTTP | Request routing via YARP |
-| `Expense Service → AI Engine` | gRPC/Protobuf | Expense parsing & categorization |
-| `Productivity Service → AI Engine` | gRPC/Protobuf | Task parsing, transcription, summarization |
+|| Route | Protocol | Description |
+||-------|----------|-------------|
+|| `Frontend → Gateway` | REST/JSON | All client-facing API calls |
+|| `Gateway → Expense Service` | HTTP | Request routing via YARP |
+|| `Gateway → Productivity Service` | HTTP | Request routing via YARP |
+|| `Expense Service → AI Engine` | gRPC/Protobuf | Expense parsing & categorization |
+|| `Productivity Service → AI Engine` | gRPC/Protobuf | Task parsing, transcription, summarization |
+
+### Frontend Routes (App Router)
+| Route | Description |
+|------|-------------|
+| `/` | Redirects to `/dashboard` |
+| `/dashboard` | Overview of all modules (expenses, tasks, journal) |
+| `/expenses` | 💰 Expense tracking with AI-powered entry |
+| `/tasks` | 📋 Task management with natural language parsing |
+| `/journal` | 📓 Journal entries with audio transcription |
+| `/dev-tools` | 🛠️ Developer utilities (formatters, calculators, prompt library) |
+
+---
+
+## 🛠️ Dev Tools Module
+
+A collection of browser-based developer utilities accessible at `/dev-tools`. All tools execute entirely client-side with no backend dependencies.
+
+### Data Formatters & Converters
+| Tool | Description |
+|------|-------------|
+| JSON Formatter / Validator | Beautifies messy strings and validates syntax |
+| Base64 Encoder/Decoder | Converts text or images to Base64 and back |
+| JWT Debugger | Decodes JSON Web Tokens to view header and payload data |
+| SQL Formatter | Prettifies raw SQL queries for readability |
+| URL Encoder/Decoder | Handles special characters for web addresses |
+| YAML ↔ JSON | Switches configuration formats instantly |
+| Unix Timestamp Converter | Converts Epoch time to human-readable dates |
+
+### Calculators & Logic Tools
+| Tool | Description |
+|------|-------------|
+| Programmer's Calculator | Handles Hexadecimal, Binary, Octal, and Decimal math |
+| Bitwise Calculator | Performs AND, OR, XOR, and Bit-shift operations |
+| CRON Expression Parser | Explains cron schedules in plain English, shows next runs |
+| CSS Unit Converter | Converts PX to REM, EM, or VH/VW |
+| Regex Tester | Tests and explains regular expressions in real-time |
+| Diff Checker | Compares two text blocks to highlight code differences |
+
+### Prompt Library
+- **Variable Injection**: Prompts with `{{variable}}` placeholders for quick filling
+- **Template Versioning**: Save and restore different versions of prompts
+- **Categorized Folders**: Organize prompts by task (e.g., Refactoring, Unit Tests)
+- **Context Snippets**: Store reusable system instructions or style guides
+
+**Keyboard Shortcuts:** `Ctrl+K` to open search, `Escape` to return to tool grid.
+
+**Data Persistence:** Prompts and snippets stored in `localStorage` under keys `self-orbit:prompt-library` and `self-orbit:prompt-snippets`.
 
 ---
 
