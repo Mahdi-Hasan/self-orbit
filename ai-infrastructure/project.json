@@ -1,0 +1,29 @@
+{
+    "name": "ai-infrastructure",
+    "$schema": "../node_modules/nx/schemas/project-schema.json",
+    "projectType": "application",
+    "sourceRoot": "ai-infrastructure/app",
+    "targets": {
+        "serve": {
+            "executor": "nx:run-commands",
+            "options": {
+                "command": "python -m app.main",
+                "cwd": "ai-infrastructure"
+            }
+        },
+        "test": {
+            "executor": "nx:run-commands",
+            "options": {
+                "command": "pytest tests/ -v",
+                "cwd": "ai-infrastructure"
+            }
+        },
+        "lint": {
+            "executor": "nx:run-commands",
+            "options": {
+                "command": "ruff check app/ tests/",
+                "cwd": "ai-infrastructure"
+            }
+        }
+    }
+}

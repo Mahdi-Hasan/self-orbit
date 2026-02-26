@@ -1,0 +1,22 @@
+{
+    "name": "self-orbit",
+    "version": "0.1.0",
+    "private": true,
+    "scripts": {
+        "build:all": "nx run-many -t build",
+        "test:all": "nx run-many -t test",
+        "lint:all": "nx run-many -t lint",
+        "dev:frontend": "nx dev frontend",
+        "dev:ai": "nx serve ai-infrastructure",
+        "graph": "nx graph",
+        "affected:test": "nx affected -t test",
+        "affected:build": "nx affected -t build"
+    },
+    "devDependencies": {
+        "nx": "latest",
+        "@nx/workspace": "latest",
+        "@nx/next": "latest",
+        "@nx/dotnet": "latest",
+        "@nxlv/python": "latest"
+    }
+}

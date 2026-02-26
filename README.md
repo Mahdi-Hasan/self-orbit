@@ -125,6 +125,7 @@ self-orbit/
 ├── k8s/                       # ☸️ Kubernetes manifests
 ├── docs/                      # 📘 Architecture & ADRs
 ├── scripts/                   # 🔧 Build & dev automation
+├── nx.json                    # ⚙️ Nx Workspace configuration
 ├── docker-compose.yml         # 🐳 Local orchestration
 └── docker-compose.override.yml
 ```
@@ -141,33 +142,31 @@ self-orbit/
 - [Docker & Docker Compose](https://docker.com)
 - [Protocol Buffers Compiler](https://grpc.io/docs/protoc-installation/)
 
-### Local Development
+### Local Development (via Nx)
+
+This repository uses **Nx** to orchestrate tasks across Python, .NET, and Next.js.
 
 ```bash
 # Clone the repository
 git clone https://github.com/yourusername/self-orbit.git
 cd self-orbit
 
-# Generate protobuf stubs
-./scripts/generate-protos.ps1
+# Install Nx & dependencies
+npm install
 
 # Start infrastructure (PostgreSQL)
 docker-compose up -d postgres-expense postgres-productivity
 
-# Start AI Infrastructure
-cd ai-infrastructure
-pip install -r requirements.txt
-python -m app.main
+# Generate protobuf stubs
+./scripts/generate-protos.ps1
 
-# Start Backend Services
-cd ../backend
-dotnet run --project services/expense-service/src/SelfOrbit.ExpenseService.Api
-dotnet run --project services/productivity-service/src/SelfOrbit.ProductivityService.Api
-dotnet run --project gateway/src/SelfOrbit.Gateway
+# Start the full stack locally via Nx
+npm run dev:ai            # Starts Python AI Engine
+npm run dev:frontend      # Starts Next.js app
+# (Run .NET services through Visual Studio / Rider, or dotnet cli)
 
-# Start Frontend
-cd ../frontend
-npm install && npm run dev
+# Visualize workspace dependencies
+npm run graph
 ```
 
 ### Docker Compose (Full Stack)
@@ -176,17 +175,24 @@ npm install && npm run dev
 docker-compose up --build
 ```
 
-### Running Tests
+### Running Tests (via Nx)
 
 ```bash
-# .NET
-cd backend && dotnet test SelfOrbit.sln
+# Run tests for all projects across all languages
+npm run test:all
 
-# Python
-cd ai-infrastructure && pytest tests/ -v --cov=app
+# Run tests only for projects affected by your current changes
+npm run affected:test
+```
 
-# Frontend
-cd frontend && npm test
+### Building Projects
+
+```bash
+# Build all projects in the correct dependency order
+npm run build:all
+
+# Build only affected projects
+npm run affected:build
 ```
 
 ---

@@ -72,3 +72,7 @@ Desktop.ini
 *_pb2.py
 *_pb2_grpc.py
 *_pb2.pyi
+
+# ---- Nx ----
+.nx/cache
+.nx/workspace-data
