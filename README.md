@@ -21,65 +21,62 @@
 ## 🏗️ System Architecture
 
 ```mermaid
-graph TB
-    subgraph "Client Layer"
-        FE["🖥️ Next.js 15 Frontend<br/>(TypeScript · App Router · SSR)"]
-        DT["🛠️ Dev Tools<br/>(Client-side utilities)"]
+graph TD
+    classDef client fill:#0070f3,stroke:#0051a8,color:#fff
+    classDef gateway fill:#6366f1,stroke:#4f46e5,color:#fff
+    classDef microservice fill:#f59e0b,stroke:#d97706,color:#fff
+    classDef ai fill:#8b5cf6,stroke:#7c3aed,color:#fff
+    classDef database fill:#336791,stroke:#2a5278,color:#fff
+    classDef devtools fill:#10b981,stroke:#059669,color:#fff,stroke-dasharray: 5 5
+
+    subgraph ClientLayer
+        FE["🖥️ Next.js 15 Frontend"]:::client
+        DT["🛠️ Dev Tools (Browser Only)"]:::devtools
     end
 
-    subgraph "API Gateway Layer"
-        GW["🔀 API Gateway<br/>(YARP Reverse Proxy · Rate Limiting · Request Routing)"]
+    subgraph GatewayLayer
+        GW["🔀 API Gateway (YARP)"]:::gateway
     end
 
-    subgraph "Service Mesh — Backend Microservices"
-        ES["💰 Expense Service<br/>(.NET 10 · Clean Architecture · CQRS)"]
-        PS["📅 Productivity Service<br/>(.NET 10 · Clean Architecture · CQRS)"]
+    subgraph ServiceMesh
+        ES["💰 Expense Service (.NET 10)"]:::microservice
+        PS["📅 Productivity Service (.NET 10)"]:::microservice
     end
 
-    subgraph "AI Infrastructure"
-        AI["🧠 AI Engine<br/>(Python 3.13 · FastAPI · gRPC Server)"]
+    subgraph AIInfra
+        AI["🧠 AI Engine (Python 3.13)"]:::ai
     end
 
-    subgraph "Data Layer"
-        PG1[("PostgreSQL<br/>Expense DB")]
-        PG2[("PostgreSQL<br/>Productivity DB")]
+    subgraph DataLayer
+        PG1[("PostgreSQL Expense DB")]:::database
+        PG2[("PostgreSQL Productivity DB")]:::database
     end
 
     FE -->|"REST/JSON"| GW
-    DT -->|"Browser Only<br/>(No Backend)"|"✓"
     GW -->|"HTTP Routing"| ES
     GW -->|"HTTP Routing"| PS
     ES -->|"gRPC/Protobuf"| AI
     PS -->|"gRPC/Protobuf"| AI
-    ES --> PG1
-    PS --> PG2
-
-    style FE fill:#0070f3,stroke:#0051a8,color:#fff
-    style DT fill:#10b981,stroke:#059669,color:#fff
-    style GW fill:#6366f1,stroke:#4f46e5,color:#fff
-    style ES fill:#f59e0b,stroke:#d97706,color:#fff
-    style PS fill:#f59e0b,stroke:#d97706,color:#fff
-    style AI fill:#8b5cf6,stroke:#7c3aed,color:#fff
-    style PG1 fill:#336791,stroke:#2a5278,color:#fff
-    style PG2 fill:#336791,stroke:#2a5278,color:#fff
+    ES -->|"EF Core"| PG1
+    PS -->|"EF Core"| PG2
 ```
 
 ---
 
 ## ⚡ Tech Stack & Engineering Principles
 
-| Layer | Technology | Patterns & Practices |
-|-------|-----------|---------------------|
-| **Frontend** | Next.js 15, TypeScript (strict), React Server Components | Server-first rendering, optimistic UI, typed API clients |
-| **API Gateway** | .NET 10, YARP | Centralized routing, request aggregation, API versioning |
-| **Backend Services** | .NET 10, EF Core, LiteBus, FluentValidation | Clean Architecture, CQRS, DDD, Vertical Slice, Repository + UoW |
-| **AI Engine** | Python 3.13, FastAPI, gRPC, Pydantic v2 | Pipeline-based processing, async-first, schema validation |
-| **Communication** | gRPC (inter-service), REST/JSON (client-facing) | Protobuf contracts, retry policies, circuit breakers |
-| **Data** | PostgreSQL, EF Core Migrations | DB-per-service, no lazy loading, explicit transactions |
-| **Observability** | Serilog, structured JSON logging | Correlation IDs, distributed tracing readiness |
-| **Containerization** | Docker, Docker Compose | Multi-stage builds, health checks, network isolation |
-| **Orchestration** | Kubernetes manifests | Deployments, Services, StatefulSets, ConfigMaps, HPA-ready |
-| **Testing** | xUnit, FluentAssertions, Moq, pytest, pytest-asyncio | Unit · Integration · Contract tests across all layers |
+| Layer                      | Technology                                               | Patterns & Practices                                            |
+| -------------------------- | -------------------------------------------------------- | --------------------------------------------------------------- |
+| **Frontend**         | Next.js 15, TypeScript (strict), React Server Components | Server-first rendering, optimistic UI, typed API clients        |
+| **API Gateway**      | .NET 10, YARP                                            | Centralized routing, request aggregation, API versioning        |
+| **Backend Services** | .NET 10, EF Core, LiteBus, FluentValidation              | Clean Architecture, CQRS, DDD, Vertical Slice, Repository + UoW |
+| **AI Engine**        | Python 3.13, FastAPI, gRPC, Pydantic v2                  | Pipeline-based processing, async-first, schema validation       |
+| **Communication**    | gRPC (inter-service), REST/JSON (client-facing)          | Protobuf contracts, retry policies, circuit breakers            |
+| **Data**             | PostgreSQL, EF Core Migrations                           | DB-per-service, no lazy loading, explicit transactions          |
+| **Observability**    | Serilog, structured JSON logging                         | Correlation IDs, distributed tracing readiness                  |
+| **Containerization** | Docker, Docker Compose                                   | Multi-stage builds, health checks, network isolation            |
+| **Orchestration**    | Kubernetes manifests                                     | Deployments, Services, StatefulSets, ConfigMaps, HPA-ready      |
+| **Testing**          | xUnit, FluentAssertions, Moq, pytest, pytest-asyncio     | Unit · Integration · Contract tests across all layers         |
 
 ### 🎯 Architectural Pillars
 
@@ -149,7 +146,7 @@ self-orbit/
 - [.NET 10 SDK](https://dotnet.microsoft.com/download)
 - [Python 3.13+](https://python.org)
 - [Node.js 20+](https://nodejs.org)
-- [Docker & Docker Compose](https://docker.com)
+- [Docker &amp; Docker Compose](https://docker.com)
 - [Protocol Buffers Compiler](https://grpc.io/docs/protoc-installation/)
 
 ### Local Development (via Nx)
@@ -209,22 +206,23 @@ npm run affected:build
 
 ## 🔗 Service Communication & Frontend Navigation
 
-| Route | Protocol | Description |
-|-------|----------|-------------|
-| `Frontend → Gateway` | REST/JSON | All client-facing API calls |
-| `Gateway → Expense Service` | HTTP | Request routing via YARP |
-| `Gateway → Productivity Service` | HTTP | Request routing via YARP |
-| `Expense Service → AI Engine` | gRPC/Protobuf | Expense parsing & categorization |
+| Route                                 | Protocol      | Description                                |
+| ------------------------------------- | ------------- | ------------------------------------------ |
+| `Frontend → Gateway`               | REST/JSON     | All client-facing API calls                |
+| `Gateway → Expense Service`        | HTTP          | Request routing via YARP                   |
+| `Gateway → Productivity Service`   | HTTP          | Request routing via YARP                   |
+| `Expense Service → AI Engine`      | gRPC/Protobuf | Expense parsing & categorization           |
 | `Productivity Service → AI Engine` | gRPC/Protobuf | Task parsing, transcription, summarization |
 
 ### Frontend Routes (App Router)
-| Route | Description |
-|------|-------------|
-| `/` | Redirects to `/dashboard` |
-| `/dashboard` | Overview of all modules (expenses, tasks, journal) |
-| `/expenses` | 💰 Expense tracking with AI-powered entry |
-| `/tasks` | 📋 Task management with natural language parsing |
-| `/journal` | 📓 Journal entries with audio transcription |
+
+| Route          | Description                                                        |
+| -------------- | ------------------------------------------------------------------ |
+| `/`          | Redirects to `/dashboard`                                        |
+| `/dashboard` | Overview of all modules (expenses, tasks, journal)                 |
+| `/expenses`  | 💰 Expense tracking with AI-powered entry                          |
+| `/tasks`     | 📋 Task management with natural language parsing                   |
+| `/journal`   | 📓 Journal entries with audio transcription                        |
 | `/dev-tools` | 🛠️ Developer utilities (formatters, calculators, prompt library) |
 
 ---
@@ -234,27 +232,30 @@ npm run affected:build
 A collection of browser-based developer utilities accessible at `/dev-tools`. All tools execute entirely client-side with no backend dependencies.
 
 ### Data Formatters & Converters
-| Tool | Description |
-|------|-------------|
-| JSON Formatter / Validator | Beautifies messy strings and validates syntax |
-| Base64 Encoder/Decoder | Converts text or images to Base64 and back |
-| JWT Debugger | Decodes JSON Web Tokens to view header and payload data |
-| SQL Formatter | Prettifies raw SQL queries for readability |
-| URL Encoder/Decoder | Handles special characters for web addresses |
-| YAML ↔ JSON | Switches configuration formats instantly |
-| Unix Timestamp Converter | Converts Epoch time to human-readable dates |
+
+| Tool                       | Description                                             |
+| -------------------------- | ------------------------------------------------------- |
+| JSON Formatter / Validator | Beautifies messy strings and validates syntax           |
+| Base64 Encoder/Decoder     | Converts text or images to Base64 and back              |
+| JWT Debugger               | Decodes JSON Web Tokens to view header and payload data |
+| SQL Formatter              | Prettifies raw SQL queries for readability              |
+| URL Encoder/Decoder        | Handles special characters for web addresses            |
+| YAML ↔ JSON               | Switches configuration formats instantly                |
+| Unix Timestamp Converter   | Converts Epoch time to human-readable dates             |
 
 ### Calculators & Logic Tools
-| Tool | Description |
-|------|-------------|
-| Programmer's Calculator | Handles Hexadecimal, Binary, Octal, and Decimal math |
-| Bitwise Calculator | Performs AND, OR, XOR, and Bit-shift operations |
-| CRON Expression Parser | Explains cron schedules in plain English, shows next runs |
-| CSS Unit Converter | Converts PX to REM, EM, or VH/VW |
-| Regex Tester | Tests and explains regular expressions in real-time |
-| Diff Checker | Compares two text blocks to highlight code differences |
+
+| Tool                    | Description                                               |
+| ----------------------- | --------------------------------------------------------- |
+| Programmer's Calculator | Handles Hexadecimal, Binary, Octal, and Decimal math      |
+| Bitwise Calculator      | Performs AND, OR, XOR, and Bit-shift operations           |
+| CRON Expression Parser  | Explains cron schedules in plain English, shows next runs |
+| CSS Unit Converter      | Converts PX to REM, EM, or VH/VW                          |
+| Regex Tester            | Tests and explains regular expressions in real-time       |
+| Diff Checker            | Compares two text blocks to highlight code differences    |
 
 ### Prompt Library
+
 - **Variable Injection**: Prompts with `{{variable}}` placeholders for quick filling
 - **Template Versioning**: Save and restore different versions of prompts
 - **Categorized Folders**: Organize prompts by task (e.g., Refactoring, Unit Tests)
@@ -269,23 +270,25 @@ A collection of browser-based developer utilities accessible at `/dev-tools`. Al
 ## 📊 API Endpoints
 
 ### Expense Service
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/api/v1/expenses` | Create expense (triggers AI parsing) |
-| `GET` | `/api/v1/expenses` | List expenses with filters |
-| `GET` | `/api/v1/expenses/{id}` | Get expense by ID |
-| `POST` | `/api/v1/budgets` | Set budget for category/period |
-| `GET` | `/api/v1/budgets` | List active budgets |
+
+| Method   | Endpoint                  | Description                          |
+| -------- | ------------------------- | ------------------------------------ |
+| `POST` | `/api/v1/expenses`      | Create expense (triggers AI parsing) |
+| `GET`  | `/api/v1/expenses`      | List expenses with filters           |
+| `GET`  | `/api/v1/expenses/{id}` | Get expense by ID                    |
+| `POST` | `/api/v1/budgets`       | Set budget for category/period       |
+| `GET`  | `/api/v1/budgets`       | List active budgets                  |
 
 ### Productivity Service
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/api/v1/tasks` | Create task (triggers AI parsing) |
-| `GET` | `/api/v1/tasks` | List tasks with filters |
-| `PATCH` | `/api/v1/tasks/{id}/status` | Transition task state |
-| `POST` | `/api/v1/journal` | Create journal entry |
-| `POST` | `/api/v1/journal/audio` | Upload audio for transcription |
-| `GET` | `/api/v1/journal` | List journal entries |
+
+| Method    | Endpoint                      | Description                       |
+| --------- | ----------------------------- | --------------------------------- |
+| `POST`  | `/api/v1/tasks`             | Create task (triggers AI parsing) |
+| `GET`   | `/api/v1/tasks`             | List tasks with filters           |
+| `PATCH` | `/api/v1/tasks/{id}/status` | Transition task state             |
+| `POST`  | `/api/v1/journal`           | Create journal entry              |
+| `POST`  | `/api/v1/journal/audio`     | Upload audio for transcription    |
+| `GET`   | `/api/v1/journal`           | List journal entries              |
 
 ---
 
