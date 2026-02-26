@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using SelfOrbit.BuildingBlocks.Infrastructure;
 using SelfOrbit.ExpenseService.Application.Interfaces;
 using SelfOrbit.ExpenseService.Domain.Aggregates;
+using SelfOrbit.ExpenseService.Infrastructure.Persistence;
 
 namespace SelfOrbit.ExpenseService.Infrastructure.Repositories;
 

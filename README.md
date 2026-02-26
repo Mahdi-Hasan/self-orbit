@@ -24,6 +24,7 @@
 graph TB
     subgraph "Client Layer"
         FE["🖥️ Next.js 15 Frontend<br/>(TypeScript · App Router · SSR)"]
+        DT["🛠️ Dev Tools<br/>(Client-side utilities)"]
     end
 
     subgraph "API Gateway Layer"
@@ -45,6 +46,7 @@ graph TB
     end
 
     FE -->|"REST/JSON"| GW
+    DT -->|"Browser Only<br/>(No Backend)"|"✓"
     GW -->|"HTTP Routing"| ES
     GW -->|"HTTP Routing"| PS
     ES -->|"gRPC/Protobuf"| AI
@@ -53,8 +55,9 @@ graph TB
     PS --> PG2
 
     style FE fill:#0070f3,stroke:#0051a8,color:#fff
+    style DT fill:#10b981,stroke:#059669,color:#fff
     style GW fill:#6366f1,stroke:#4f46e5,color:#fff
-    style ES fill:#10b981,stroke:#059669,color:#fff
+    style ES fill:#f59e0b,stroke:#d97706,color:#fff
     style PS fill:#f59e0b,stroke:#d97706,color:#fff
     style AI fill:#8b5cf6,stroke:#7c3aed,color:#fff
     style PG1 fill:#336791,stroke:#2a5278,color:#fff
@@ -206,13 +209,13 @@ npm run affected:build
 
 ## 🔗 Service Communication & Frontend Navigation
 
-|| Route | Protocol | Description |
-||-------|----------|-------------|
-|| `Frontend → Gateway` | REST/JSON | All client-facing API calls |
-|| `Gateway → Expense Service` | HTTP | Request routing via YARP |
-|| `Gateway → Productivity Service` | HTTP | Request routing via YARP |
-|| `Expense Service → AI Engine` | gRPC/Protobuf | Expense parsing & categorization |
-|| `Productivity Service → AI Engine` | gRPC/Protobuf | Task parsing, transcription, summarization |
+| Route | Protocol | Description |
+|-------|----------|-------------|
+| `Frontend → Gateway` | REST/JSON | All client-facing API calls |
+| `Gateway → Expense Service` | HTTP | Request routing via YARP |
+| `Gateway → Productivity Service` | HTTP | Request routing via YARP |
+| `Expense Service → AI Engine` | gRPC/Protobuf | Expense parsing & categorization |
+| `Productivity Service → AI Engine` | gRPC/Protobuf | Task parsing, transcription, summarization |
 
 ### Frontend Routes (App Router)
 | Route | Description |

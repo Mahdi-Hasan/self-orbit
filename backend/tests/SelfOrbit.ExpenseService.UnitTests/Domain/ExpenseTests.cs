@@ -1,3 +1,4 @@
+using Xunit;
 using FluentAssertions;
 using SelfOrbit.ExpenseService.Domain.Aggregates;
 using SelfOrbit.ExpenseService.Domain.Enums;
