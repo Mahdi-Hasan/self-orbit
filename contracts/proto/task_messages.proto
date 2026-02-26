@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package selforbit.tasks;
+
+option csharp_namespace = "SelfOrbit.Contracts.Grpc.Tasks";
+
+import "common.proto";
+
+// Request to parse natural language into structured task data
+message ParseTaskRequest {
+  string raw_text = 1;
+  string timezone = 2;
+}
+
+// Structured task extracted by AI
+message ParseTaskResponse {
+  selforbit.common.ProcessingStatus status = 1;
+  ParsedTask task = 2;
+  selforbit.common.ErrorDetail error = 3;
+}
+
+// AI-extracted task structure
+message ParsedTask {
+  string title = 1;
+  string description = 2;
+  TaskPriority priority = 3;
+  selforbit.common.Timestamp deadline = 4;
+  selforbit.common.ConfidenceLevel confidence = 5;
+  repeated string tags = 6;
+  string estimated_duration = 7;
+  map<string, string> metadata = 8;
+}
+
+// Task priority levels
+enum TaskPriority {
+  TASK_PRIORITY_UNSPECIFIED = 0;
+  URGENT = 1;
+  HIGH = 2;
+  MEDIUM = 3;
+  LOW = 4;
+}

@@ -1,0 +1,132 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: expense-service
+  namespace: self-orbit
+  labels:
+    app: expense-service
+    tier: backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: expense-service
+  template:
+    metadata:
+      labels:
+        app: expense-service
+    spec:
+      containers:
+        - name: expense-service
+          image: selforbit/expense-service:latest
+          ports:
+            - containerPort: 5001
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              value: Production
+            - name: ConnectionStrings__ExpenseDb
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: expense-connection-string
+            - name: GrpcServices__AiService__Address
+              value: "http://ai-infrastructure:50051"
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "250m"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 5001
+            initialDelaySeconds: 15
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 5001
+            initialDelaySeconds: 5
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: expense-service
+  namespace: self-orbit
+spec:
+  selector:
+    app: expense-service
+  ports:
+    - port: 5001
+      targetPort: 5001
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: productivity-service
+  namespace: self-orbit
+  labels:
+    app: productivity-service
+    tier: backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: productivity-service
+  template:
+    metadata:
+      labels:
+        app: productivity-service
+    spec:
+      containers:
+        - name: productivity-service
+          image: selforbit/productivity-service:latest
+          ports:
+            - containerPort: 5002
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              value: Production
+            - name: ConnectionStrings__ProductivityDb
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: productivity-connection-string
+            - name: GrpcServices__AiService__Address
+              value: "http://ai-infrastructure:50051"
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "250m"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 5002
+            initialDelaySeconds: 15
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 5002
+            initialDelaySeconds: 5
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: productivity-service
+  namespace: self-orbit
+spec:
+  selector:
+    app: productivity-service
+  ports:
+    - port: 5002
+      targetPort: 5002
+  type: ClusterIP

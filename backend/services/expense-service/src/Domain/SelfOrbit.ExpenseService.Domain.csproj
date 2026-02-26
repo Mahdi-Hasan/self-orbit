@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>SelfOrbit.ExpenseService.Domain</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\building-blocks\domain\SelfOrbit.BuildingBlocks.Domain.csproj" />
+  </ItemGroup>
+</Project>

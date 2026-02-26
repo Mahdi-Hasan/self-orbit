@@ -1,0 +1,73 @@
+syntax = "proto3";
+
+package selforbit.journal;
+
+option csharp_namespace = "SelfOrbit.Contracts.Grpc.Journal";
+
+import "common.proto";
+
+// Request to transcribe audio to text
+message TranscribeRequest {
+  bytes audio_data = 1;
+  string audio_format = 2;
+  string language = 3;
+}
+
+// Transcription result
+message TranscribeResponse {
+  selforbit.common.ProcessingStatus status = 1;
+  TranscriptionResult result = 2;
+  selforbit.common.ErrorDetail error = 3;
+}
+
+// Transcription output
+message TranscriptionResult {
+  string text = 1;
+  string detected_language = 2;
+  double confidence_score = 3;
+  int32 duration_seconds = 4;
+  repeated TranscriptionSegment segments = 5;
+}
+
+// Time-stamped transcription segment
+message TranscriptionSegment {
+  string text = 1;
+  double start_time = 2;
+  double end_time = 3;
+}
+
+// Request to summarize journal text
+message SummarizeRequest {
+  string text = 1;
+  SummaryStyle style = 2;
+  int32 max_length = 3;
+}
+
+// Summarization result
+message SummarizeResponse {
+  selforbit.common.ProcessingStatus status = 1;
+  SummaryResult result = 2;
+  selforbit.common.ErrorDetail error = 3;
+}
+
+// Summary output
+message SummaryResult {
+  string summary = 1;
+  repeated string key_topics = 2;
+  string mood = 3;
+  repeated ActionItem action_items = 4;
+}
+
+// Extracted action item from journal
+message ActionItem {
+  string description = 1;
+  selforbit.tasks.TaskPriority priority = 2;
+}
+
+// Summary style preference
+enum SummaryStyle {
+  SUMMARY_STYLE_UNSPECIFIED = 0;
+  BRIEF = 1;
+  DETAILED = 2;
+  BULLET_POINTS = 3;
+}

@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package selforbit.expenses;
+
+option csharp_namespace = "SelfOrbit.Contracts.Grpc.Expenses";
+
+import "common.proto";
+
+// Request to parse natural language into structured expense data
+message ParseExpenseRequest {
+  string raw_text = 1;
+  string user_locale = 2;
+  string preferred_currency = 3;
+}
+
+// Structured expense extracted by AI
+message ParseExpenseResponse {
+  selforbit.common.ProcessingStatus status = 1;
+  ParsedExpense expense = 2;
+  selforbit.common.ErrorDetail error = 3;
+}
+
+// AI-extracted expense structure
+message ParsedExpense {
+  selforbit.common.Money amount = 1;
+  string category = 2;
+  string description = 3;
+  string merchant = 4;
+  selforbit.common.Timestamp date = 5;
+  selforbit.common.ConfidenceLevel confidence = 6;
+  repeated string tags = 7;
+  map<string, string> metadata = 8;
+}

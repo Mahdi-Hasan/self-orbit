@@ -1,0 +1,138 @@
+version: "3.9"
+
+services:
+  # ─────────────────────────── Databases ───────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: selforbit-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./scripts/init-databases.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - selforbit-network
+
+  # ──────────────────── AI Infrastructure (Python) ────────────────
+  ai-infrastructure:
+    build:
+      context: .
+      dockerfile: ai-infrastructure/Dockerfile
+    container_name: selforbit-ai
+    ports:
+      - "8000:8000" # REST
+      - "50051:50051" # gRPC
+    environment:
+      - APP_NAME=self-orbit-ai
+      - ENVIRONMENT=development
+      - LOG_LEVEL=INFO
+      - GRPC_PORT=50051
+      - REST_PORT=8000
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8000/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - selforbit-network
+
+  # ──────────────────── Expense Service (.NET) ────────────────────
+  expense-service:
+    build:
+      context: .
+      dockerfile: backend/services/expense-service/Dockerfile
+    container_name: selforbit-expense
+    ports:
+      - "5001:5001"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__ExpenseDb=Host=postgres;Port=5432;Database=selforbit_expense;Username=postgres;Password=postgres
+      - GrpcServices__AiService__Address=http://ai-infrastructure:50051
+    depends_on:
+      postgres:
+        condition: service_healthy
+      ai-infrastructure:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:5001/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - selforbit-network
+
+  # ──────────────── Productivity Service (.NET) ───────────────────
+  productivity-service:
+    build:
+      context: .
+      dockerfile: backend/services/productivity-service/Dockerfile
+    container_name: selforbit-productivity
+    ports:
+      - "5002:5002"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__ProductivityDb=Host=postgres;Port=5432;Database=selforbit_productivity;Username=postgres;Password=postgres
+      - GrpcServices__AiService__Address=http://ai-infrastructure:50051
+    depends_on:
+      postgres:
+        condition: service_healthy
+      ai-infrastructure:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:5002/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - selforbit-network
+
+  # ────────────────────── API Gateway (.NET) ──────────────────────
+  gateway:
+    build:
+      context: .
+      dockerfile: backend/gateway/Dockerfile
+    container_name: selforbit-gateway
+    ports:
+      - "5000:5000"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ReverseProxy__Clusters__expense-cluster__Destinations__expense-service__Address=http://expense-service:5001
+      - ReverseProxy__Clusters__productivity-cluster__Destinations__productivity-service__Address=http://productivity-service:5002
+    depends_on:
+      expense-service:
+        condition: service_healthy
+      productivity-service:
+        condition: service_healthy
+    networks:
+      - selforbit-network
+
+  # ────────────────────── Frontend (Next.js) ──────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: selforbit-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://gateway:5000
+    depends_on:
+      - gateway
+    networks:
+      - selforbit-network
+
+volumes:
+  postgres-data:
+
+
+networks:
+  selforbit-network:
+    driver: bridge

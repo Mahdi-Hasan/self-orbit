@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>SelfOrbit.BuildingBlocks.Application</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="FluentValidation" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
+    <PackageReference Include="LiteBus" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\domain\SelfOrbit.BuildingBlocks.Domain.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package selforbit.ai;
+
+option csharp_namespace = "SelfOrbit.Contracts.Grpc";
+
+import "expense_messages.proto";
+import "task_messages.proto";
+import "journal_messages.proto";
+
+// =============================================================================
+// AI Service — Central intelligence gateway
+//
+// All .NET backend services communicate with this service via gRPC.
+// REST endpoints are available as fallback only.
+// =============================================================================
+service AIService {
+  // Parse natural language text into a structured expense record.
+  // Called by the Expense Service when a user submits free-form expense text.
+  rpc ParseExpense(selforbit.expenses.ParseExpenseRequest)
+      returns (selforbit.expenses.ParseExpenseResponse);
+
+  // Parse natural language text into a structured task record.
+  // Called by the Productivity Service for task creation from natural input.
+  rpc ParseTask(selforbit.tasks.ParseTaskRequest)
+      returns (selforbit.tasks.ParseTaskResponse);
+
+  // Transcribe audio data into text.
+  // Called by the Productivity Service for audio journal entries.
+  rpc TranscribeAudio(selforbit.journal.TranscribeRequest)
+      returns (selforbit.journal.TranscribeResponse);
+
+  // Summarize journal text and extract key topics, mood, and action items.
+  // Called by the Productivity Service after transcription or for text entries.
+  rpc SummarizeJournal(selforbit.journal.SummarizeRequest)
+      returns (selforbit.journal.SummarizeResponse);
+}
